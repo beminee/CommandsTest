@@ -58,7 +58,7 @@ namespace CommandsTest.Services
 
         private string generateJwtToken(User user)
         {
-            // generate token that is valid for 7 days
+            // generate token that is valid for 7 days.
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(_appSettings.Secret); // Key for our Sha256 encryption.
             var tokenDescriptor = new SecurityTokenDescriptor
