@@ -25,7 +25,8 @@ namespace CommandsTest
         {
             services.AddControllers();
             services.AddDbContext<DatabaseContext>(options =>
-                options.UseSqlite("Data Source=localdatabase.db"));
+                options.UseSqlite(Configuration.GetConnectionString("sqlite")));
+            services.AddScoped<IRepository, SqliteRepository>();
 
             services.Configure<AppSettings>(Configuration.GetSection("AppSettings"));
 
