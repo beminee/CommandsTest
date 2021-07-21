@@ -13,11 +13,11 @@ namespace CommandsTest.Controllers
     [Route("[controller]")]
     public class CommandsController : Controller
     {
-        private readonly DatabaseContext _context;
+        private readonly IRepository _repository;
 
-        public CommandsController(DatabaseContext context)
+        public CommandsController(IRepository repository)
         {
-            _context = context;
+            _repository = repository;
         }
 
         // GET: commands
@@ -25,7 +25,7 @@ namespace CommandsTest.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Commands>>> GetAllCommands()
         {
-            return await _context.Commands.ToListAsync();
+            return Ok(await _repository.GetAllCommands());
         }
 
         // GET: commands/{id}
@@ -33,7 +33,7 @@ namespace CommandsTest.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Commands>> GetCommand(Guid id)
         {
-            var command = await _context.Commands.FindAsync(id);
+            var command = await _repository.GetCommandById(id);
 
             if (command == null)
             {
@@ -53,13 +53,9 @@ namespace CommandsTest.Controllers
         [HttpPost]
         public async Task<IActionResult> AddCommand([Bind("Id,Description,Key")] Commands command)
         {
-            // Not sure if it's the correct approach?
-            command.Id = Guid.NewGuid();
-
             if (ModelState.IsValid)
             {
-                _context.Add(command);
-                await _context.SaveChangesAsync();
+                await _repository.AddCommand(command);
                 return Ok();
             }
             return NotFound();
@@ -70,17 +66,11 @@ namespace CommandsTest.Controllers
         [HttpDelete("{id}")]
         public async Task<ActionResult<Commands>> DeleteCommandById(Guid id)
         {
-            var command = await _context.Commands.FindAsync(id);
-
-            if (command == null)
-            {
+            var result = await _repository.DeleteCommandById(id);
+            if (!result)  {
                 return NotFound();
-            }
-
-            _context.Remove(command);
-
-            await _context.SaveChangesAsync();
-
+            } 
+            
             return Ok();
         }
 
